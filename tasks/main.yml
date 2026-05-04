@@ -1,0 +1,19 @@
+---
+- name: Include deploy tasks
+  ansible.builtin.include_tasks:
+    file: deploy.yml
+    apply:
+      tags:
+        - deploy
+  tags:
+    - deploy
+
+- name: Include sync tasks
+  ansible.builtin.include_tasks:
+    file: sync.yml
+    apply:
+      tags:
+        - sync
+  tags:
+    - never
+    - sync

@@ -1,0 +1,118 @@
+---
+# ComposeFlux Deploy Role - Default Variables
+# ComposeFlux: https://github.com/veerendra2/composeflux
+# Docs: https://veerendra2.github.io/composeflux/
+
+# ComposeFlux image tag
+# Example: "latest", "v0.1.0"
+composeflux_version: "latest"
+
+# Path on the server where compose.yml, .env, and deploy key are stored
+composeflux_deploy_path: "/opt/docker/composeflux"
+
+# ---------------------------------------------------------------------------
+# Required
+# ---------------------------------------------------------------------------
+
+# Git repository SSH URL
+# Example: "git@github.com:user/infra-repo.git"
+composeflux_git_repo_url: ""
+
+# Path to stacks directory relative to repo root
+# Example: "servers/myhost"
+composeflux_stack_path: ""
+
+# ---------------------------------------------------------------------------
+# Git Options
+# ---------------------------------------------------------------------------
+
+# Local path where the repo is cloned inside the container
+# Default (ComposeFlux): /opt/compose-stack
+# Example: "/opt/docker/compose-stack"
+composeflux_git_clone_path: ""
+
+# Git branch to track
+# Default (ComposeFlux): main
+composeflux_git_branch: ""
+
+# Git polling interval
+# Default (ComposeFlux): 5m
+# Example: "10m", "1h"
+composeflux_git_interval: ""
+
+# ---------------------------------------------------------------------------
+# Deploy Key
+# ---------------------------------------------------------------------------
+
+# Option A: Fetch from secrets provider
+# Secret name/ID in Bitwarden or Infisical that holds the SSH private key
+# Example: "SSH_PRIVATE_KEY"
+composeflux_git_deploy_key_secret_ref: ""
+
+# Option B: Mount from disk
+# Path to SSH private key on the Ansible controller (local machine)
+# The key will be copied to the server next to compose.yml
+# Example: "~/.ssh/composeflux_deploy"
+composeflux_deploy_key_src: ""
+
+# Path inside the container where the key is mounted
+# Default (ComposeFlux): /.ssh/composeflux_id_rsa
+composeflux_git_ssh_key_path: "/.ssh/composeflux_id_rsa"
+
+# ---------------------------------------------------------------------------
+# Secrets Provider
+# ---------------------------------------------------------------------------
+
+# Set to "bitwarden" or "infisical" to enable secrets management
+composeflux_secrets_provider: ""
+
+# --- Bitwarden ---
+composeflux_bitwarden_access_token: ""
+composeflux_bitwarden_organization_id: ""
+composeflux_bitwarden_project_id: ""
+
+# --- Infisical ---
+composeflux_infisical_client_id: ""
+composeflux_infisical_client_secret: ""
+composeflux_infisical_environment: ""
+composeflux_infisical_project_id: ""
+composeflux_infisical_secret_path: ""
+
+# ---------------------------------------------------------------------------
+# Features
+# ---------------------------------------------------------------------------
+
+# Cron schedule for image update checks
+# Example: "0 4 * * 1" (every Monday at 4am)
+composeflux_image_update_schedule: ""
+
+# Enable metrics endpoint (listens on :9090 inside container)
+# Access via external network or container IP
+composeflux_metrics_enabled: false
+
+# Log level: "debug", "info", "warn", "error"
+composeflux_log_level: ""
+
+# Include source file/line in logs
+composeflux_log_add_source: ""
+
+# ---------------------------------------------------------------------------
+# Networking
+# ---------------------------------------------------------------------------
+
+# List of external Docker networks to attach ComposeFlux to
+# Networks must already exist on the server
+# Example: ["proxy", "monitoring"]
+composeflux_external_networks: []
+
+# ---------------------------------------------------------------------------
+# Extra
+# ---------------------------------------------------------------------------
+
+# Additional volume mounts
+# Example: ["./data:/data:ro"]
+composeflux_extra_volumes: []
+
+# Additional environment variables (dict)
+# Example: { "MY_VAR": "value" }
+composeflux_extra_env: {}

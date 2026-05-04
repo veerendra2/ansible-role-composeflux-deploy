@@ -1,0 +1,6 @@
+---
+- name: Run ComposeFlux sync
+  community.docker.docker_compose_v2_exec:
+    project_src: "{{ composeflux_deploy_path }}"
+    service: composeflux
+    command: /composeflux sync
