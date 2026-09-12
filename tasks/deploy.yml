@@ -25,6 +25,7 @@
     src: env.j2
     dest: "{{ composeflux_deploy_path }}/.env"
     mode: "0600"
+  no_log: true
 
 - name: Template compose.yml
   ansible.builtin.template:
@@ -36,4 +37,5 @@
   community.docker.docker_compose_v2:
     project_src: "{{ composeflux_deploy_path }}"
     pull: always
+    state: present
   register: composeflux_deploy_result

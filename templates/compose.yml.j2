@@ -6,9 +6,7 @@ services:
     env_file:
       - .env
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /etc/localtime:/etc/localtime:ro
-      - /etc/timezone:/etc/timezone:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
 {% if composeflux_git_clone_path | length > 0 %}
       - {{ composeflux_git_clone_path }}:{{ composeflux_git_clone_path }}
 {% endif %}
