@@ -1,0 +1,26 @@
+---
+galaxy_info:
+  role_name: composeflux_deploy
+  namespace: veerendra
+  author: Veerendra Kakumanu
+  description: Deploy ComposeFlux - GitOps continuous deployment tool for Docker Compose
+  license: MIT
+  min_ansible_version: "2.14"
+  platforms:
+    - name: Ubuntu
+      versions:
+        - focal
+        - jammy
+        - noble
+    - name: Debian
+      versions:
+        - bullseye
+        - bookworm
+  issue_tracker_url: https://github.com/veerendra2/ansible-role-composeflux-deploy/issues
+  galaxy_tags:
+    - docker
+    - compose
+    - gitops
+    - deployment
+
+dependencies: []

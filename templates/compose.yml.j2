@@ -1,0 +1,31 @@
+---
+services:
+  composeflux:
+    image: ghcr.io/veerendra2/composeflux:{{ composeflux_version }}
+    container_name: composeflux
+    env_file:
+      - .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+{% if composeflux_git_clone_path | length > 0 %}
+      - {{ composeflux_git_clone_path }}:{{ composeflux_git_clone_path }}
+{% endif %}
+{% if composeflux_ssh_key_local_path | length > 0 %}
+      - ./deploy_key:{{ composeflux_ssh_key_container_path }}:ro
+{% endif %}
+{% for vol in composeflux_extra_volumes %}
+      - {{ vol }}
+{% endfor %}
+    restart: unless-stopped
+{% if composeflux_external_networks | length > 0 %}
+    networks:
+{% for net in composeflux_external_networks %}
+      - {{ net }}
+{% endfor %}
+
+networks:
+{% for net in composeflux_external_networks %}
+  {{ net }}:
+    external: true
+{% endfor %}
+{% endif %}

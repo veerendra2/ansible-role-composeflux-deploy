@@ -1,0 +1,9 @@
+*.retry
+*.tar.gz
+.cache/
+.ansible/
+.molecule/
+__pycache__/
+*.pyc
+.env
+.vault_pass

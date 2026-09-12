@@ -1,0 +1,150 @@
+---
+# ComposeFlux Deploy Role - Default Variables
+# ComposeFlux: https://github.com/veerendra2/composeflux
+# Docs: https://veerendra2.github.io/composeflux/
+
+# ComposeFlux image tag
+# Example: "latest", "v0.1.0"
+composeflux_version: "latest"
+
+# Path on the server where compose.yml, .env, and deploy key are stored
+composeflux_deploy_path: "/opt/docker/composeflux"
+
+# ---------------------------------------------------------------------------
+# Required
+# ---------------------------------------------------------------------------
+
+# Git repository SSH URL
+# Example: "git@github.com:user/infra-repo.git"
+composeflux_git_repo_url: ""
+
+# Path to stacks directory relative to repo root
+# Example: "servers/myhost"
+composeflux_stack_path: ""
+
+# ---------------------------------------------------------------------------
+# Git Options
+# ---------------------------------------------------------------------------
+
+# Local path where the repo is cloned inside the container
+# Default (ComposeFlux): /opt/compose-stack
+# Example: "/opt/docker/compose-stack"
+composeflux_git_clone_path: ""
+
+# Git branch to track
+# Default (ComposeFlux): main
+composeflux_git_branch: ""
+
+# Git polling interval
+# Default (ComposeFlux): 5m
+# Example: "10m", "1h"
+composeflux_git_interval: ""
+
+# Stack config file name inside each stack directory
+# Default (ComposeFlux): stack.yml
+composeflux_config_file: ""
+
+# ---------------------------------------------------------------------------
+# Deploy Key
+# ---------------------------------------------------------------------------
+
+# Option A: Fetch from secrets provider
+# Secret name/ID in Bitwarden or Infisical that holds the SSH private key
+# Example: "SSH_PRIVATE_KEY"
+composeflux_ssh_key_secret_ref: ""
+
+# Option B: Copy from Ansible controller
+# Path to SSH private key on the local machine (Ansible controller)
+# The key will be copied to the target host next to compose.yml
+# Example: "~/.ssh/composeflux_deploy"
+composeflux_ssh_key_local_path: ""
+
+# Path inside the container where the key is mounted
+# Default (ComposeFlux): /.ssh/composeflux_id_rsa
+composeflux_ssh_key_container_path: "/.ssh/composeflux_id_rsa"
+
+# ---------------------------------------------------------------------------
+# Local Secrets (Age Encrypted)
+# ---------------------------------------------------------------------------
+
+# Passphrase for Age-encrypted secret files in the Git repo
+# When set, ComposeFlux decrypts *.age files found alongside compose stacks
+composeflux_age_passphrase: ""
+
+# ---------------------------------------------------------------------------
+# Remote Secrets Provider (Bitwarden or Infisical)
+# ---------------------------------------------------------------------------
+# Provider is auto-detected from whichever credentials are set.
+# Only configure ONE provider.
+
+# --- Bitwarden ---
+composeflux_bitwarden_access_token: ""
+composeflux_bitwarden_organization_id: ""
+composeflux_bitwarden_project_id: ""
+# Override only for self-hosted Bitwarden
+composeflux_bitwarden_api_url: ""
+composeflux_bitwarden_identity_url: ""
+
+# --- Infisical ---
+composeflux_infisical_client_id: ""
+composeflux_infisical_client_secret: ""
+composeflux_infisical_environment: ""
+composeflux_infisical_project_id: ""
+composeflux_infisical_secret_path: ""
+# Override only for self-hosted Infisical
+composeflux_infisical_site_url: ""
+
+# ---------------------------------------------------------------------------
+# Reconciliation & Pruning
+# ---------------------------------------------------------------------------
+
+# Cron expression for Docker image update checks
+# Example: "0 4 * * 1" (every Monday at 4am). Empty = disabled.
+composeflux_image_update_schedule: ""
+
+# Proactive health reconciliation interval
+# ComposeFlux redeploys stacks with non-running containers at this interval
+# Example: "5m". Empty = disabled.
+composeflux_health_reconcile_interval: ""
+
+# Periodic Docker resource pruning interval (images, volumes, build cache)
+# Set to "0" to disable. Default (ComposeFlux): 24h
+composeflux_prune_interval: ""
+
+# Remove orphan containers during deploy
+# Default (ComposeFlux): true
+composeflux_remove_orphans: ""
+
+# ---------------------------------------------------------------------------
+# Logging
+# ---------------------------------------------------------------------------
+
+# Log level: "debug", "info", "warn", "error"
+composeflux_log_level: ""
+
+# Log format: "console" or "json"
+composeflux_log_format: ""
+
+# Include source file/line in logs
+composeflux_log_add_source: ""
+
+# ---------------------------------------------------------------------------
+# Networking
+# ---------------------------------------------------------------------------
+
+# List of external Docker networks to attach ComposeFlux to
+# Networks must already exist on the server
+# Example: ["proxy", "monitoring"]
+composeflux_external_networks: []
+
+# ---------------------------------------------------------------------------
+# Extra
+# ---------------------------------------------------------------------------
+
+# Additional volume mounts
+# Example: ["./data:/data:ro"]
+composeflux_extra_volumes: []
+
+# Additional environment variables (dict)
+# Example: { "MY_VAR": "value" }
+composeflux_extra_env: {}
