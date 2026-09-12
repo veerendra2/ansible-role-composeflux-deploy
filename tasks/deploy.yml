@@ -1,4 +1,12 @@
 ---
+- name: Validate required ComposeFlux variables
+  ansible.builtin.assert:
+    that:
+      - composeflux_git_repo_url | length > 0
+      - composeflux_stack_path | length > 0
+    fail_msg: >-
+      composeflux_git_repo_url and composeflux_stack_path are required.
+
 - name: Create ComposeFlux deploy directory
   ansible.builtin.file:
     path: "{{ composeflux_deploy_path }}"
