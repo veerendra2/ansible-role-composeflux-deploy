@@ -51,17 +51,17 @@ composeflux_config_file: ""
 # Option A: Fetch from secrets provider
 # Secret name/ID in Bitwarden or Infisical that holds the SSH private key
 # Example: "SSH_PRIVATE_KEY"
-composeflux_git_deploy_key_secret_ref: ""
+composeflux_ssh_key_secret_ref: ""
 
-# Option B: Mount from disk
-# Path to SSH private key on the Ansible controller (local machine)
-# The key will be copied to the server next to compose.yml
+# Option B: Copy from Ansible controller
+# Path to SSH private key on the local machine (Ansible controller)
+# The key will be copied to the target host next to compose.yml
 # Example: "~/.ssh/composeflux_deploy"
-composeflux_deploy_key_src: ""
+composeflux_ssh_key_local_path: ""
 
 # Path inside the container where the key is mounted
 # Default (ComposeFlux): /.ssh/composeflux_id_rsa
-composeflux_git_ssh_key_path: "/.ssh/composeflux_id_rsa"
+composeflux_ssh_key_container_path: "/.ssh/composeflux_id_rsa"
 
 # ---------------------------------------------------------------------------
 # Local Secrets (Age Encrypted)

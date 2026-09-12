@@ -10,8 +10,8 @@ services:
 {% if composeflux_git_clone_path | length > 0 %}
       - {{ composeflux_git_clone_path }}:{{ composeflux_git_clone_path }}
 {% endif %}
-{% if composeflux_deploy_key_src | length > 0 %}
-      - ./deploy_key:{{ composeflux_git_ssh_key_path }}:ro
+{% if composeflux_ssh_key_local_path | length > 0 %}
+      - ./deploy_key:{{ composeflux_ssh_key_container_path }}:ro
 {% endif %}
 {% for vol in composeflux_extra_volumes %}
       - {{ vol }}

@@ -32,9 +32,9 @@ ansible-galaxy collection install -r requirements.yml
 | `composeflux_git_interval`              | `""`                         | `"10m"`                                    | Git polling interval (ComposeFlux default: `5m`)                            |
 | `composeflux_git_clone_path`            | `""`                         | `"/opt/compose-stack"`                     | Clone path inside container (ComposeFlux default: `/opt/compose-stack`)     |
 | `composeflux_config_file`               | `""`                         | `"stack.yml"`                              | Stack config filename (ComposeFlux default: `stack.yml`)                    |
-| `composeflux_deploy_key_src`            | `""`                         | `"~/.ssh/composeflux_deploy"`              | Local SSH key path to copy to host (Option A)                               |
-| `composeflux_git_ssh_key_path`          | `"/.ssh/composeflux_id_rsa"` | `"/.ssh/id_rsa"`                           | Mount path of SSH key inside container                                      |
-| `composeflux_git_deploy_key_secret_ref` | `""`                         | `"SSH_PRIVATE_KEY"`                        | Secret name/ID in secrets manager holding the SSH key (Option B)            |
+| `composeflux_ssh_key_local_path`        | `""`                         | `"~/.ssh/composeflux_deploy"`              | SSH key path on Ansible controller (Option A)                               |
+| `composeflux_ssh_key_container_path`    | `"/.ssh/composeflux_id_rsa"` | `"/.ssh/id_rsa"`                           | SSH key mount path inside container                                         |
+| `composeflux_ssh_key_secret_ref`        | `""`                         | `"SSH_PRIVATE_KEY"`                        | Secret name/ID holding SSH key (Option B)                                   |
 | `composeflux_age_passphrase`            | `""`                         | `"{{ vault_age_passphrase }}"`             | Passphrase for Age-encrypted secret files in git                            |
 | `composeflux_bitwarden_access_token`    | `""`                         | `"{{ vault_bw_token }}"`                   | Bitwarden machine account access token                                      |
 | `composeflux_bitwarden_organization_id` | `""`                         | `"org-uuid"`                               | Bitwarden organization ID                                                   |
@@ -70,14 +70,14 @@ ansible-galaxy collection install -r requirements.yml
         composeflux_git_repo_url: "git@github.com:user/infra-repo.git"
         composeflux_stack_path: "servers/myhost"
 
-        # Deploy key from local disk (Option A)
-        composeflux_deploy_key_src: "~/.ssh/composeflux_deploy"
+        # SSH key — required to clone the repo; pick one
+        composeflux_ssh_key_local_path: "~/.ssh/composeflux_deploy"
+        # composeflux_ssh_key_secret_ref: "SSH_PRIVATE_KEY"
 
         # Age-encrypted secrets stored in the git repo
         composeflux_age_passphrase: "{{ vault_age_passphrase }}"
 
-        # Or use Infisical for remote secrets (Option B)
-        # composeflux_git_deploy_key_secret_ref: "SSH_PRIVATE_KEY"
+        # Infisical remote secrets
         # composeflux_infisical_client_id: "{{ vault_infisical_client_id }}"
         # composeflux_infisical_client_secret: "{{ vault_infisical_client_secret }}"
         # composeflux_infisical_environment: "prod"
