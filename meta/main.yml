@@ -1,8 +1,8 @@
 ---
 galaxy_info:
   role_name: composeflux_deploy
-  namespace: veerendra
-  author: Veerendra Kakumanu
+  namespace: veerendra2
+  author: Veerendra K
   description: Deploy ComposeFlux - GitOps continuous deployment tool for Docker Compose
   license: MIT
   min_ansible_version: "2.14"

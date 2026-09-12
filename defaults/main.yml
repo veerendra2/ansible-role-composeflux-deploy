@@ -26,7 +26,7 @@ composeflux_stack_path: ""
 # Git Options
 # ---------------------------------------------------------------------------
 
-# Local path where the repo is cloned inside the container
+# Local path where the repo is cloned on the host and mount inside the container
 # Default (ComposeFlux): /opt/compose-stack
 # Example: "/opt/docker/compose-stack"
 composeflux_git_clone_path: ""
