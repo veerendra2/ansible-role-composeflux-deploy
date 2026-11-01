@@ -59,7 +59,3 @@ See [defaults/main.yml](./defaults/main.yml)
 | `deploy` | Templates `.env` and `compose.yml`, then deploys or updates the ComposeFlux daemon.         |
 | `sync`   | Forces a one-shot reconciliation **with the daemon stopped**, then starts the daemon again. |
 
-`--tags sync` stops the ComposeFlux daemon, runs `/composeflux sync` in a separate one-shot
-container (`docker compose run --rm`), and starts the daemon again even if the sync fails. This
-keeps a single writer against the Docker project, so a manual sync can never race the daemon's own
-reconciliation. The daemon is unavailable for the duration of the sync.
