@@ -1,6 +1,40 @@
 ---
-- name: Run ComposeFlux sync
-  community.docker.docker_compose_v2_exec:
-    project_src: "{{ composeflux_deploy_path }}"
-    service: composeflux
-    command: /composeflux sync
+- name: Run ComposeFlux sync with the daemon stopped
+  block:
+    - name: Stop ComposeFlux daemon
+      community.docker.docker_compose_v2:
+        project_src: "{{ composeflux_deploy_path }}"
+        state: stopped
+
+    - name: Run one-shot ComposeFlux sync
+      community.docker.docker_compose_v2_run:
+        project_src: "{{ composeflux_deploy_path }}"
+        service: composeflux
+        command: /composeflux sync
+        cleanup: true
+        tty: false
+      register: composeflux_sync_result
+      # The module returns rc without failing when the command exits non-zero.
+      failed_when: composeflux_sync_result.rc != 0
+
+    - name: Show ComposeFlux sync output
+      ansible.builtin.debug:
+        msg: "{{ composeflux_sync_result.stdout_lines }}"
+      when: composeflux_sync_result.stdout_lines | length > 0
+
+  rescue:
+    - name: Show ComposeFlux sync error output
+      ansible.builtin.debug:
+        msg: "{{ composeflux_sync_result.stderr_lines | default([]) }}"
+
+    - name: Report ComposeFlux sync failure
+      ansible.builtin.fail:
+        msg: >-
+          ComposeFlux sync failed with rc={{ composeflux_sync_result.rc | default('unknown') }}.
+          See the stderr output above.
+
+  always:
+    - name: Start ComposeFlux daemon
+      community.docker.docker_compose_v2:
+        project_src: "{{ composeflux_deploy_path }}"
+        state: present
