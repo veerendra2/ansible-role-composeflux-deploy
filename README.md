@@ -51,3 +51,11 @@ See [defaults/main.yml](./defaults/main.yml)
 
         # Force sync (re-fetch secrets without git changes): --tags sync
 ```
+
+## Tags
+
+| Tag      | Behaviour                                                                                  |
+| -------- | ------------------------------------------------------------------------------------------ |
+| `deploy` | Templates `.env` and `compose.yml`, then deploys or updates the ComposeFlux daemon.         |
+| `sync`   | Forces a one-shot reconciliation **with the daemon stopped**, then starts the daemon again. |
+
