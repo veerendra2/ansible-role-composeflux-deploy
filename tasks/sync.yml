@@ -21,7 +21,6 @@
       ansible.builtin.debug:
         msg: "{{ composeflux_sync_result.stdout_lines }}"
       when: composeflux_sync_result.stdout_lines | length > 0
-
   rescue:
     - name: Show ComposeFlux sync error output
       ansible.builtin.debug:
