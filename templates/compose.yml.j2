@@ -13,6 +13,9 @@ services:
 {% if composeflux_ssh_key_local_path | length > 0 %}
       - ./deploy_key:{{ composeflux_ssh_key_container_path }}:ro
 {% endif %}
+{% if composeflux_ssh_known_hosts | length > 0 or composeflux_ssh_known_hosts_local_path | length > 0 %}
+      - ./known_hosts:/etc/composeflux/known_hosts:ro
+{% endif %}
 {% for vol in composeflux_extra_volumes %}
       - {{ vol }}
 {% endfor %}
