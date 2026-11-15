@@ -27,6 +27,37 @@
     mode: "0600"
   when: composeflux_ssh_key_local_path | length > 0
   no_log: true
+  register: composeflux_deploy_key_result
+
+- name: Validate SSH known hosts inputs
+  ansible.builtin.assert:
+    that:
+      - composeflux_ssh_known_hosts is sequence
+      - composeflux_ssh_known_hosts is not string
+      - composeflux_ssh_known_hosts is not mapping
+      - not (composeflux_ssh_known_hosts | length > 0 and composeflux_ssh_known_hosts_local_path | length > 0)
+    fail_msg: >-
+      composeflux_ssh_known_hosts must be a list of known_hosts lines, and only one of
+      composeflux_ssh_known_hosts or composeflux_ssh_known_hosts_local_path may be set.
+
+- name: Write SSH known hosts from inline content
+  ansible.builtin.copy:
+    content: |
+      {% for line in composeflux_ssh_known_hosts %}
+      {{ line }}
+      {% endfor %}
+    dest: "{{ composeflux_deploy_path }}/known_hosts"
+    mode: "0644"
+  when: composeflux_ssh_known_hosts | length > 0
+  register: composeflux_known_hosts_inline_result
+
+- name: Copy SSH known hosts from Ansible controller
+  ansible.builtin.copy:
+    src: "{{ composeflux_ssh_known_hosts_local_path }}"
+    dest: "{{ composeflux_deploy_path }}/known_hosts"
+    mode: "0644"
+  when: composeflux_ssh_known_hosts_local_path | length > 0
+  register: composeflux_known_hosts_local_result
 
 - name: Template .env file
   ansible.builtin.template:
@@ -45,5 +76,13 @@
   community.docker.docker_compose_v2:
     project_src: "{{ composeflux_deploy_path }}"
     pull: always
+    # Single-file bind mounts keep the old inode when copy atomically replaces
+    # the file, so recreate the container to pick up rotated keys.
+    recreate: >-
+      {{ 'always'
+         if (composeflux_deploy_key_result is changed
+             or composeflux_known_hosts_inline_result is changed
+             or composeflux_known_hosts_local_result is changed)
+         else 'auto' }}
     state: present
   register: composeflux_deploy_result

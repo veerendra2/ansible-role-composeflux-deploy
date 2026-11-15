@@ -64,6 +64,24 @@ composeflux_ssh_key_local_path: ""
 composeflux_ssh_key_container_path: "/.ssh/composeflux_id_rsa"
 
 # ---------------------------------------------------------------------------
+# SSH Known Hosts (self-hosted Git)
+# ---------------------------------------------------------------------------
+# Required only for hosts other than github.com/gitlab.com (Gitea, Forgejo,
+# self-hosted GitLab, non-default SSH port). Set one of the two options.
+# Generate with: ssh-keyscan git.example.com > ~/.ssh/composeflux_known_hosts
+# Do not pass -t: a single key type can fail with "knownhosts: key mismatch".
+
+# Option A: Inline known_hosts entries (list of lines)
+# Example:
+#   - "git.example.com ssh-ed25519 AAAA..."
+#   - "git.example.com ssh-rsa AAAA..."
+composeflux_ssh_known_hosts: []
+
+# Option B: Copy from Ansible controller
+# Example: "~/.ssh/composeflux_known_hosts"
+composeflux_ssh_known_hosts_local_path: ""
+
+# ---------------------------------------------------------------------------
 # Local Secrets (Age Encrypted)
 # ---------------------------------------------------------------------------
 

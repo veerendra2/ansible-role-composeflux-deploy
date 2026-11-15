@@ -52,6 +52,28 @@ See [defaults/main.yml](./defaults/main.yml)
         # Force sync (re-fetch secrets without git changes): --tags sync
 ```
 
+## Self-hosted Git hosts
+
+The ComposeFlux image only trusts `github.com` and `gitlab.com`. To clone from any other SSH host (Gitea, Forgejo, self-hosted GitLab, or a server on a non-default port), give the role the host keys:
+
+```bash
+ssh-keyscan git.example.com > ~/.ssh/composeflux_known_hosts
+```
+
+```yaml
+composeflux_ssh_known_hosts_local_path: "~/.ssh/composeflux_known_hosts"
+# or inline:
+# composeflux_ssh_known_hosts:
+#   - "git.example.com ssh-ed25519 AAAA..."
+#   - "git.example.com ssh-rsa AAAA..."
+```
+
+Do not pass `-t` to `ssh-keyscan`: a single key type can fail with `knownhosts: key mismatch`, because go-git negotiates its own host key algorithm. For a non-default port, scan with `-p 2222` and use an `ssh://git@git.example.com:2222/group/repo.git` URL.
+
+The role mounts the file at `/etc/composeflux/known_hosts` and sets `SSH_KNOWN_HOSTS=/etc/ssh/ssh_known_hosts:/etc/composeflux/known_hosts`, so the built-in GitHub/GitLab trust is kept.
+
+Verify the host fingerprint out of band before trusting a scanned key.
+
 ## Tags
 
 | Tag      | Behaviour                                                                                  |
