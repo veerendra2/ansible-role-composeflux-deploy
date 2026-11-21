@@ -18,6 +18,15 @@ services:
 {% endfor %}
 {% endif %}
     restart: unless-stopped
+{% if composeflux_socket_proxy_enabled %}
+    # Per-container allowlist so the one-off `docker compose run` sync container
+    # gets the same access as the daemon.
+    labels:
+      socket-proxy.allow.head: /_ping
+      socket-proxy.allow.get: '(/v1\..{1,2}/(version|_ping|containers/.*|images/.*|networks.*|volumes.*|distribution/.*)|/_ping)'
+      socket-proxy.allow.post: '(/v1\..{1,2}/(containers/create|containers/[a-zA-Z0-9_.-]+/(start|stop|restart|kill|rename|wait)|images/create|networks/create|volumes/create|volumes/prune|images/prune|build/prune|build))'
+      socket-proxy.allow.delete: '(/v1\..{1,2}/(containers/[a-zA-Z0-9_.-]+|networks/[a-zA-Z0-9_.-]+))'
+{% endif %}
 {% if composeflux_external_networks | length > 0 or composeflux_socket_proxy_enabled %}
     networks:
 {% for net in composeflux_external_networks %}
@@ -44,6 +53,7 @@ services:
     command:
       - "-listenip=0.0.0.0"
       - "-allowfrom=composeflux"
+      - "-proxycontainername=socket-proxy"
       - '-allowHEAD=/_ping'
       - '-allowGET=(/v1\..{1,2}/(version|_ping|containers/.*|images/.*|networks.*|volumes.*|distribution/.*)|/_ping)'
       - '-allowPOST=(/v1\..{1,2}/(containers/create|containers/[a-zA-Z0-9_.-]+/(start|stop|restart|kill|rename|wait)|images/create|networks/create|volumes/create|volumes/prune|images/prune|build/prune|build))'
