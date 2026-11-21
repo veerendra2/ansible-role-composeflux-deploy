@@ -1,3 +1,9 @@
+{% set cf_volumes = [] %}
+{% if not composeflux_socket_proxy_enabled %}{% set _ = cf_volumes.append('/var/run/docker.sock:/var/run/docker.sock:ro') %}{% endif %}
+{% if composeflux_git_clone_path | length > 0 %}{% set _ = cf_volumes.append(composeflux_git_clone_path ~ ':' ~ composeflux_git_clone_path) %}{% endif %}
+{% if composeflux_ssh_key_local_path | length > 0 %}{% set _ = cf_volumes.append('./deploy_key:' ~ composeflux_ssh_key_container_path ~ ':ro') %}{% endif %}
+{% if composeflux_ssh_known_hosts | length > 0 or composeflux_ssh_known_hosts_local_path | length > 0 %}{% set _ = cf_volumes.append('./known_hosts:/etc/composeflux/known_hosts:ro') %}{% endif %}
+{% set _ = cf_volumes.extend(composeflux_extra_volumes) %}
 ---
 services:
   composeflux:
@@ -5,30 +11,57 @@ services:
     container_name: composeflux
     env_file:
       - .env
+{% if cf_volumes %}
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock:ro
-{% if composeflux_git_clone_path | length > 0 %}
-      - {{ composeflux_git_clone_path }}:{{ composeflux_git_clone_path }}
-{% endif %}
-{% if composeflux_ssh_key_local_path | length > 0 %}
-      - ./deploy_key:{{ composeflux_ssh_key_container_path }}:ro
-{% endif %}
-{% if composeflux_ssh_known_hosts | length > 0 or composeflux_ssh_known_hosts_local_path | length > 0 %}
-      - ./known_hosts:/etc/composeflux/known_hosts:ro
-{% endif %}
-{% for vol in composeflux_extra_volumes %}
+{% for vol in cf_volumes %}
       - {{ vol }}
 {% endfor %}
+{% endif %}
     restart: unless-stopped
-{% if composeflux_external_networks | length > 0 %}
+{% if composeflux_external_networks | length > 0 or composeflux_socket_proxy_enabled %}
     networks:
 {% for net in composeflux_external_networks %}
       - {{ net }}
 {% endfor %}
+{% if composeflux_socket_proxy_enabled %}
+      - socketproxy
+{% endif %}
+{% endif %}
+{% if composeflux_socket_proxy_enabled %}
 
+  socket-proxy:
+    image: wollomatic/socket-proxy:{{ composeflux_socket_proxy_version }}
+    container_name: socket-proxy
+    restart: unless-stopped
+    read_only: true
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges
+    mem_limit: 64M
+    # The socket is root:docker; root avoids hardcoding a host-specific GID.
+    user: "0:0"
+    command:
+      - "-listenip=0.0.0.0"
+      - "-allowfrom=composeflux"
+      - '-allowHEAD=/_ping'
+      - '-allowGET=(/v1\..{1,2}/(version|_ping|containers/.*|images/.*|networks.*|volumes.*|distribution/.*)|/_ping)'
+      - '-allowPOST=(/v1\..{1,2}/(containers/create|containers/[a-zA-Z0-9_.-]+/(start|stop|restart|kill|rename|wait)|images/create|networks/create|volumes/create|volumes/prune|images/prune|build/prune|build))'
+      - '-allowDELETE=(/v1\..{1,2}/(containers/[a-zA-Z0-9_.-]+|networks/[a-zA-Z0-9_.-]+))'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    networks:
+      - socketproxy
+
+{% endif %}
+{% if composeflux_external_networks | length > 0 or composeflux_socket_proxy_enabled %}
 networks:
 {% for net in composeflux_external_networks %}
   {{ net }}:
     external: true
 {% endfor %}
+{% if composeflux_socket_proxy_enabled %}
+  socketproxy:
+    driver: bridge
+{% endif %}
 {% endif %}
