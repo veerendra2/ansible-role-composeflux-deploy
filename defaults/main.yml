@@ -165,7 +165,8 @@ composeflux_external_networks: []
 composeflux_socket_proxy_enabled: false
 
 # socket-proxy image tag. Upstream publishes "1" (rolling major) and exact
-# versions such as "1.14.0"; there is no "latest" tag.
+# versions such as "1.14.0"; there is no "latest" tag. Per-container labels
+# need socket-proxy >= 1.11.
 composeflux_socket_proxy_version: "1"
 
 # ---------------------------------------------------------------------------

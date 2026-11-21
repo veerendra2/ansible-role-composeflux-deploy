@@ -33,8 +33,12 @@ services:
       - {{ net }}
 {% endfor %}
 {% if composeflux_socket_proxy_enabled %}
-      - socketproxy
+      - composeflux_socketproxy
 {% endif %}
+{% endif %}
+{% if composeflux_socket_proxy_enabled %}
+    depends_on:
+      - socket-proxy
 {% endif %}
 {% if composeflux_socket_proxy_enabled %}
 
@@ -61,7 +65,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:
-      - socketproxy
+      - composeflux_socketproxy
 
 {% endif %}
 {% if composeflux_external_networks | length > 0 or composeflux_socket_proxy_enabled %}
@@ -71,7 +75,7 @@ networks:
     external: true
 {% endfor %}
 {% if composeflux_socket_proxy_enabled %}
-  socketproxy:
+  composeflux_socketproxy:
     driver: bridge
 {% endif %}
 {% endif %}

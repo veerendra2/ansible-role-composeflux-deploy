@@ -87,7 +87,9 @@ The role then starts a hardened `socket-proxy` container on a private bridge net
 published ports, and ComposeFlux gets `DOCKER_HOST=tcp://socket-proxy:2375`. The allowlist is the
 minimum ComposeFlux needs (containers, images, networks, volumes, build cache, image update checks,
 pruning). Pick an image tag with `composeflux_socket_proxy_version` (default `1`; exact pins such as
-`1.14.0` also work — upstream has no `latest` tag).
+`1.14.0` also work — upstream has no `latest` tag; the role needs socket-proxy 1.11 or newer).
+This narrows the Docker API surface ComposeFlux can reach; it is not a sandbox against a
+compromised ComposeFlux, which can still create containers.
 
 ## Tags
 
