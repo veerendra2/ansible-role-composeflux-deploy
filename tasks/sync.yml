@@ -4,6 +4,8 @@
     - name: Stop ComposeFlux daemon
       community.docker.docker_compose_v2:
         project_src: "{{ composeflux_deploy_path }}"
+        services:
+          - composeflux
         state: stopped
 
     - name: Run one-shot ComposeFlux sync
@@ -32,4 +34,6 @@
     - name: Start ComposeFlux daemon
       community.docker.docker_compose_v2:
         project_src: "{{ composeflux_deploy_path }}"
+        services:
+          - composeflux
         state: present
