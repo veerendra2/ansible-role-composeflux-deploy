@@ -1,3 +1,7 @@
+{% set allow_head = '/_ping' %}
+{% set allow_get = '(/v1\..{1,2}/(version|_ping|containers/.*|images/.*|networks.*|volumes.*|distribution/.*)|/_ping)' %}
+{% set allow_post = '(/v1\..{1,2}/(containers/create|containers/[a-zA-Z0-9_.-]+/(start|stop|restart|kill|rename|wait)|images/create|networks/create|volumes/create|volumes/prune|images/prune|build/prune|build))' %}
+{% set allow_delete = '(/v1\..{1,2}/(containers/[a-zA-Z0-9_.-]+|networks/[a-zA-Z0-9_.-]+))' %}
 {% set cf_volumes = [] %}
 {% if not composeflux_socket_proxy_enabled %}{% set _ = cf_volumes.append('/var/run/docker.sock:/var/run/docker.sock:ro') %}{% endif %}
 {% if composeflux_git_clone_path | length > 0 %}{% set _ = cf_volumes.append(composeflux_git_clone_path ~ ':' ~ composeflux_git_clone_path) %}{% endif %}
@@ -22,10 +26,10 @@ services:
     # Per-container allowlist so the one-off `docker compose run` sync container
     # gets the same access as the daemon.
     labels:
-      socket-proxy.allow.head: /_ping
-      socket-proxy.allow.get: '(/v1\..{1,2}/(version|_ping|containers/.*|images/.*|networks.*|volumes.*|distribution/.*)|/_ping)'
-      socket-proxy.allow.post: '(/v1\..{1,2}/(containers/create|containers/[a-zA-Z0-9_.-]+/(start|stop|restart|kill|rename|wait)|images/create|networks/create|volumes/create|volumes/prune|images/prune|build/prune|build))'
-      socket-proxy.allow.delete: '(/v1\..{1,2}/(containers/[a-zA-Z0-9_.-]+|networks/[a-zA-Z0-9_.-]+))'
+      socket-proxy.allow.head: '{{ allow_head }}'
+      socket-proxy.allow.get: '{{ allow_get }}'
+      socket-proxy.allow.post: '{{ allow_post }}'
+      socket-proxy.allow.delete: '{{ allow_delete }}'
 {% endif %}
 {% if composeflux_external_networks | length > 0 or composeflux_socket_proxy_enabled %}
     networks:
@@ -58,10 +62,10 @@ services:
       - "-listenip=0.0.0.0"
       - "-allowfrom=composeflux"
       - "-proxycontainername=socket-proxy"
-      - '-allowHEAD=/_ping'
-      - '-allowGET=(/v1\..{1,2}/(version|_ping|containers/.*|images/.*|networks.*|volumes.*|distribution/.*)|/_ping)'
-      - '-allowPOST=(/v1\..{1,2}/(containers/create|containers/[a-zA-Z0-9_.-]+/(start|stop|restart|kill|rename|wait)|images/create|networks/create|volumes/create|volumes/prune|images/prune|build/prune|build))'
-      - '-allowDELETE=(/v1\..{1,2}/(containers/[a-zA-Z0-9_.-]+|networks/[a-zA-Z0-9_.-]+))'
+      - '-allowHEAD={{ allow_head }}'
+      - '-allowGET={{ allow_get }}'
+      - '-allowPOST={{ allow_post }}'
+      - '-allowDELETE={{ allow_delete }}'
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
     networks:

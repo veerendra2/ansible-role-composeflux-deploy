@@ -7,6 +7,15 @@
     fail_msg: >-
       composeflux_git_repo_url and composeflux_stack_path are required.
 
+- name: Validate socket-proxy version
+  ansible.builtin.assert:
+    that:
+      - composeflux_socket_proxy_version != 'latest'
+    fail_msg: >-
+      composeflux_socket_proxy_version cannot be "latest": wollomatic/socket-proxy
+      has no latest tag. Use "1" or an exact version such as "1.14.0".
+  when: composeflux_socket_proxy_enabled
+
 - name: Create ComposeFlux deploy directory
   ansible.builtin.file:
     path: "{{ composeflux_deploy_path }}"
@@ -76,6 +85,9 @@
   community.docker.docker_compose_v2:
     project_src: "{{ composeflux_deploy_path }}"
     pull: always
+    # Drop the socket-proxy container when the feature is switched off; without
+    # this it stays running with the Docker socket mounted.
+    remove_orphans: true
     # Single-file bind mounts keep the old inode when copy atomically replaces
     # the file, so recreate the container to pick up rotated keys.
     recreate: >-
