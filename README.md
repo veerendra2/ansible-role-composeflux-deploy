@@ -74,6 +74,23 @@ The role mounts the file at `/etc/composeflux/known_hosts` and sets `SSH_KNOWN_H
 
 Verify the host fingerprint out of band before trusting a scanned key.
 
+## Docker socket proxy
+
+By default ComposeFlux mounts `/var/run/docker.sock`. To avoid handing it the raw socket, run
+[`wollomatic/socket-proxy`](https://github.com/wollomatic/socket-proxy) alongside it:
+
+```yaml
+composeflux_socket_proxy_enabled: true
+```
+
+The role then starts a hardened `socket-proxy` container on a private bridge network with no
+published ports, and ComposeFlux gets `DOCKER_HOST=tcp://socket-proxy:2375`. The allowlist is the
+minimum ComposeFlux needs (containers, images, networks, volumes, build cache, image update checks,
+pruning). Pick an image tag with `composeflux_socket_proxy_version` (default `1`; exact pins such as
+`1.14.0` also work — upstream has no `latest` tag; the role needs socket-proxy 1.11 or newer).
+This narrows the Docker API surface ComposeFlux can reach; it is not a sandbox against a
+compromised ComposeFlux, which can still create containers.
+
 ## Tags
 
 | Tag      | Behaviour                                                                                  |
