@@ -16,6 +16,15 @@
       has no latest tag. Use "1" or an exact version such as "1.14.0".
   when: composeflux_socket_proxy_enabled
 
+- name: Validate socket-proxy network name
+  ansible.builtin.assert:
+    that:
+      - "'composeflux_socketproxy' not in composeflux_external_networks"
+    fail_msg: >-
+      composeflux_external_networks cannot contain "composeflux_socketproxy";
+      that name is reserved for the network created by the socket-proxy feature.
+  when: composeflux_socket_proxy_enabled
+
 - name: Create ComposeFlux deploy directory
   ansible.builtin.file:
     path: "{{ composeflux_deploy_path }}"
@@ -81,13 +90,27 @@
     dest: "{{ composeflux_deploy_path }}/compose.yml"
     mode: "0644"
 
+- name: Inspect socket-proxy container
+  community.docker.docker_container_info:
+    name: socket-proxy
+  register: composeflux_socket_proxy_info
+
+- name: Remove leftover socket-proxy when the feature is disabled
+  community.docker.docker_container:
+    name: socket-proxy
+    state: absent
+  vars:
+    proxy_labels: "{{ composeflux_socket_proxy_info.container.Config.Labels | default({}, true) }}"
+  when:
+    - not composeflux_socket_proxy_enabled
+    - composeflux_socket_proxy_info.container is not none
+    - proxy_labels.get('com.docker.compose.project.working_dir') == composeflux_deploy_path
+    - proxy_labels.get('com.docker.compose.service') == 'socket-proxy'
+
 - name: Deploy ComposeFlux
   community.docker.docker_compose_v2:
     project_src: "{{ composeflux_deploy_path }}"
     pull: always
-    # Drop the socket-proxy container when the feature is switched off; without
-    # this it stays running with the Docker socket mounted.
-    remove_orphans: true
     # Single-file bind mounts keep the old inode when copy atomically replaces
     # the file, so recreate the container to pick up rotated keys.
     recreate: >-
